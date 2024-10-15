@@ -7,7 +7,6 @@ class Card {
     private $isMatched;        
     private $image;      
 
-
     public function __construct($id, $image) {
         $this->id = $id;
         $this->image = $image;
@@ -15,51 +14,41 @@ class Card {
         $this->isMatched = false;
     }
 
-    
-    // Méthode pour marquer la carte comme assortie
     public function match() {
         $this->isMatched = true;
         $this->isFlipped = true;
     }
 
-    // Méthode pour retourner la carte
     public function flip() {
         $this->isFlipped = true;
     }
 
-    // Méthode pour comparer si deux cartes sont assorties (basées sur l'image)
     public function isMatched(Card $otherCard) {
         return $this->image === $otherCard->getImage();
     }
 
-    // Getter pour l'ID
     public function getID() {
         return $this->id;
     }
 
-    // Getter pour l'image réelle (quand retournée)
     public function getImage() {
         return $this->image;
     }
 
-    // Vérifie si la carte est assortie
     public function isAssorted() {
         return $this->isMatched;
     }
 
-    // Méthode pour vérifier si la carte est retournée
     public function isFlipped() {
         return $this->isFlipped;
     }
 
-    // Remettre la carte à l'état non retourné si elle n'est pas assortie
     public function resetFlip() {
         if (!$this->isMatched) {
             $this->isFlipped = false;
         }
     }
 
-    // Méthode pour afficher l'image
     public function displayCard() {
         echo "<form method='POST' style='display: inline;'>
                 <input type='hidden' name='flip' value='{$this->id}'>
@@ -69,7 +58,6 @@ class Card {
               </form>";
     }
 
-    // Méthode pour retourner la carte si l'ID correspond
     public function handleFlip($id) {
         if ($this->id == $id) {
             $this->flip();
@@ -77,63 +65,72 @@ class Card {
     }
 }
 
-// Liste des images pour les paires de cartes
-$images = [
+// Liste d'images disponibles
+$allImages = [
     'arcanin.png',
     'evoli.png',
     'goupix.png',
+    'mysdibule.png',
+    'rondoudou.png',
 ];
+
+// Choix du nombre de paires si non défini
+if (!isset($_SESSION['num_pairs'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['num_pairs'])) {
+        $_SESSION['num_pairs'] = (int)$_POST['num_pairs'];
+    } else {
+        displayPairSelectionForm(); // Affiche le formulaire de sélection
+        exit;
+    }
+}
+
+// Générer les cartes en fonction du nombre de paires choisies
+$numPairs = $_SESSION['num_pairs'];
+$images = array_slice($allImages, 0, $numPairs);
 
 $cards = [];
 foreach ($images as $index => $image) {
-    $cards[] = new Card($index + 1, $image); // Première instance de la paire
-    $cards[] = new Card($index + 4, $image); // Deuxième instance de la paire
+    $cards[] = new Card($index + 1, $image);
+    $cards[] = new Card($index + 4, $image);
 }
 
-// Mélanger les cartes une seule fois lors du démarrage de la session
+// Mélanger les cartes au démarrage de la session
 if (!isset($_SESSION['shuffled_cards'])) {
-    shuffle($cards); // Mélange les cartes
-    $_SESSION['shuffled_cards'] = $cards; // Stocke l'ordre mélangé dans la session
+    shuffle($cards);
+    $_SESSION['shuffled_cards'] = $cards;
 } else {
-    $cards = $_SESSION['shuffled_cards']; // Utilise l'ordre mélangé existant
+    $cards = $_SESSION['shuffled_cards'];
 }
 
-// Gestion du retournement et du nombre de tours
+// Gestion du retournement des cartes
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['flip'])) {
     $cardIdToFlip = $_POST['flip'];
 
-    // Si deux cartes sont déjà retournées et qu'une troisième est retournée
     if (count($_SESSION['flipped_cards'] ?? []) >= 2) {
-        // Remettre les cartes qui ne correspondent pas à l'état non retourné
         foreach ($cards as $card) {
             if (in_array($card->getID(), $_SESSION['flipped_cards'])) {
                 $card->resetFlip();
             }
         }
-        $_SESSION['flipped_cards'] = []; // Réinitialiser après 2 cartes retournées
+        $_SESSION['flipped_cards'] = [];
     }
 
-    // Retourner la carte qui a été cliquée
     foreach ($cards as $card) {
         $card->handleFlip($cardIdToFlip);
     }
 
-    // Stocker les cartes retournées dans la session pour comparer
     if (!isset($_SESSION['flipped_cards'])) {
         $_SESSION['flipped_cards'] = [];
     }
 
-    // Ajout de la carte retournée
     if (!in_array($cardIdToFlip, $_SESSION['flipped_cards'])) {
         $_SESSION['flipped_cards'][] = $cardIdToFlip;
     }
 
-    // Vérifier si deux cartes sont retournées
     if (count($_SESSION['flipped_cards']) == 2) {
         $firstCardId = $_SESSION['flipped_cards'][0];
         $secondCardId = $_SESSION['flipped_cards'][1];
 
-        // Comparer les deux cartes retournées
         $firstCard = null;
         $secondCard = null;
 
@@ -145,24 +142,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['flip'])) {
             }
         }
 
-        // Vérifie si les cartes correspondent
         if ($firstCard && $secondCard) {
             if ($firstCard->isMatched($secondCard)) {
-                $firstCard->match(); // Marquer comme assortie
-                $secondCard->match(); // Marquer comme assortie
+                $firstCard->match();
+                $secondCard->match();
             }
         }
-        // Incrémentation du nombre de tours
         $_SESSION['turn_count'] = $_SESSION['turn_count'] ?? 0;
         $_SESSION['turn_count']++;
     }
 }
 
-// Réinitialiser le jeu
 if (isset($_POST['reset'])) {
     session_destroy();
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
+}
+
+function displayPairSelectionForm() {
+    echo '<form method="POST">
+            <label for="num_pairs">Choisissez le nombre de paires :</label>
+            <select name="num_pairs" id="num_pairs">
+                <option value="3">3 Paires</option>
+                <option value="4">4 Paires</option>
+                <option value="6">6 Paires</option>
+            </select>
+            <button type="submit">Commencer</button>
+          </form>';
 }
 ?>
 
@@ -177,12 +183,11 @@ if (isset($_POST['reset'])) {
 <body>
     <div class="container">
         <p class="texte">Nombre de coups </p>
-        <p class="nbrtour"><?php echo $_SESSION['turn_count'] ??  0; ?></p>
+        <p class="nbrtour"><?php echo $_SESSION['turn_count'] ?? 0; ?></p>
     </div>
 
     <div class="container-cards">
         <?php
-        // Afficher les cartes dans la grille
         foreach ($cards as $card) {
             echo "<div class='img-container'>";
             $card->displayCard();
@@ -196,7 +201,5 @@ if (isset($_POST['reset'])) {
             <button type="submit" name="reset" class="texte2">Redémarrer</button>
         </form>
     </div>
-
 </body>
-
 </html>
