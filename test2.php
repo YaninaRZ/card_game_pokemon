@@ -91,7 +91,7 @@ $images = array_slice($allImages, 0, $numPairs);
 $cards = [];
 foreach ($images as $index => $image) {
     $cards[] = new Card($index + 1, $image);
-    $cards[] = new Card($index + 4, $image);
+    $cards[] = new Card($index + 6, $image);
 }
 
 // Mélanger les cartes au démarrage de la session
