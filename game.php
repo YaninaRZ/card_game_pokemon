@@ -1,0 +1,2 @@
+<!-- gestion des paires -->
+ 
