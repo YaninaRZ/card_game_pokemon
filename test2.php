@@ -7,20 +7,20 @@ class Card {
     private $isFlipped = false;
     private $isMatched = false;
 
-    public function __construct($id, $image) {
+    public function __construct($id, $image) { // initialise l’id et l’image 
         $this->id = $id;
         $this->image = $image;
     }
 
-    public function flip() { $this->isFlipped = true; }
-    public function match() { $this->isMatched = $this->isFlipped = true; }
-    public function reset() { if (!$this->isMatched) $this->isFlipped = false; }
-    public function isFlipped() { return $this->isFlipped; }
-    public function isMatchedWith(Card $other) { return $this->image === $other->getImage(); }
-    public function getID() { return $this->id; }
-    public function getImage() { return $this->image; }
+    public function flip() { $this->isFlipped = true; }//retourne la carte
+    public function match() { $this->isMatched = $this->isFlipped = true; }// apparie et retourne
+    public function reset() { if (!$this->isMatched) $this->isFlipped = false; }//Remet la carte face cachée
+    public function isFlipped() { return $this->isFlipped; }//envoie l’état de la carte (retournée ou non).
+    public function isMatchedWith(Card $other) { return $this->image === $other->getImage(); }// Compare l’image de cette carte avec une autre pour vérifier si elles sont identiques.
+    public function getID() { return $this->id; }// Renvoient respectivement l’ID et l’image de la carte.
+    public function getImage() { return $this->image; }//Renvoient respectivement l’ID et l’image de la carte.
 
-    public function display() {
+    public function display() {// Affiche la carte
         $img = $this->isFlipped ? $this->image : 'card_back.webp';
         echo "<form method='POST' style='display:inline;'>
                 <input type='hidden' name='flip' value='{$this->id}'>
@@ -30,12 +30,13 @@ class Card {
               </form>";
     }
 
-    public function handleFlip($id) {
+    public function handleFlip($id) {//Si l’ID de la carte correspond à celui envoyé via le formulaire, la carte est retournée.
+
         if ($this->id == $id) $this->flip();
     }
 }
 
-function displayPairSelectionForm() {
+function displayPairSelectionForm() {//Affiche un formulaire permettant au joueur de choisir le nombre de paires pour la partie.
     echo '<form method="POST">
             <label for="num_pairs">Choisissez le nombre de paires :</label>
             <select name="num_pairs" id="num_pairs">
@@ -66,6 +67,7 @@ foreach ($images as $index => $image) {
     $cards[] = new Card($index + 1, $image);
     $cards[] = new Card($index + $numPairs + 1, $image);
 }
+//Crée une liste de cartes en double pour chaque image sélectionnée.
 
 if (!isset($_SESSION['shuffled_cards'])) {
     shuffle($cards);
@@ -124,6 +126,7 @@ if (isset($_POST['reset'])) {
     <title>Memory Game</title>
 </head>
 <body>
+<p>3 ans et + </p></br>
     <div class="container">
         <p class="texte">Nombre de coups</p>
         <p class="nbrtour"><?= $_SESSION['turn_count'] ?? 0 ?></p>
