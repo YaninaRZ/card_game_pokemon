@@ -115,6 +115,20 @@ if (isset($_POST['reset'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
+
+function isGameFinished($cards) {
+    foreach ($cards as $card) {
+        if (!$card->isFlipped()) {
+            return false;
+        }
+    }
+    return true;
+}
+if (isGameFinished($cards)) {
+    session_destroy();
+    header("Location: game_over.php?score=".$_SESSION['turn_count']);  // Redirect to a game over page
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -126,9 +140,9 @@ if (isset($_POST['reset'])) {
     <title>Memory Game</title>
 </head>
 <body>
-<p>3 ans et + </p></br>
+<p>7 ans et + </p></br>
     <div class="container">
-        <p class="texte">Nombre de coups</p>
+        <p class="texte">Nombre de coups </p>
         <p class="nbrtour"><?= $_SESSION['turn_count'] ?? 0 ?></p>
     </div>
 
