@@ -11,16 +11,16 @@ $mysqlClient = new PDO(
 function initLeaderboard()
 {
     $GLOBALS["mysqlClient"]->query("DELETE from leaderboard");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (1, 'local', 800)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (2, 'local', 700)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (3, 'local', 600)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (4, 'local', 500)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (5, 'local', 400)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (6, 'local', 300)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (7, 'local', 250)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (8, 'local', 200)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (9, 'local', 150)");
-    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (10, 'local', 120)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (1, 'local', 18)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (2, 'local', 20)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (3, 'local', 22)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (4, 'local', 24)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (5, 'local', 27)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (6, 'local', 30)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (7, 'local', 35)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (8, 'local', 40)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (9, 'local', 45)");
+    $GLOBALS["mysqlClient"]->query("INSERT INTO leaderboard VALUES (10, 'local', 50)");
 }
 
 // Fonction pour insérer le nouveau score
@@ -35,7 +35,7 @@ function fillLeaderboard($pseudo, $score)
         $user->bindValue(":pos", $pos, PDO::PARAM_STR);
         $user->execute();
         $values = $user->fetchAll();
-        if ($values[0]["score"] < $score)
+        if ($values[0]["score"] > $score)
             $onLeader = TRUE;
     }
     // Si le nouveau score ne rentre pas dans le leaderboard on ne fait rien
