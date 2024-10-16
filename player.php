@@ -66,7 +66,9 @@ class player {
             if ($playerData) {
                 $this->id = $playerData['id'];
                 $this->name = $playerData['name'];
-            }  
+            } else {
+                echo "Player not found. <br>";
+            } 
         } catch (PDOException $e) {
             echo "Error fetching player: " . $e->getMessage();
         }
@@ -80,13 +82,13 @@ class player {
         return $this->name;
     }
 
-    // public function getInsertId() {
-    //     return $this->insertId;
-    // }
+    public function getInsertId() {
+        return $this->insertId;
+    }
 
-    // public function getDeletePlayer() {
-    //     return $this->deletePlayer;
-    // }
+    public function getDeletePlayer() {
+        return $this->deletePlayer;
+    }
 
    
 }
